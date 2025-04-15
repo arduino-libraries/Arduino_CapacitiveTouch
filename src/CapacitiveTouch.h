@@ -19,6 +19,8 @@
   #define LOVE_BUTTON 27
 #endif
 
+/// @cond DEV
+
 /**
  * @struct CapTouchPinMapping
  * @brief Defines the mapping between an Arduino pin and its capacitive touch hardware settings.
@@ -33,6 +35,8 @@ struct CapTouchPinMapping {
     uint8_t chac_idx;     ///< Channel control register index.
     uint8_t chac_val;     ///< Bit mask used to enable the sensor channel.
 };
+
+/// @endcond
 
 #if defined(ARDUINO_UNOR4_MINIMA)
 static const CapTouchPinMapping capTouchMappings[] = {
