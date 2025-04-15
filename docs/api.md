@@ -3,7 +3,6 @@
  Members                        | Descriptions                                
 --------------------------------|---------------------------------------------
 `class ` [`CapacitiveTouch`](#class_capacitive_touch) | A user-friendly class for capacitive touch sensing.
-`struct ` [`CapTouchPinMapping`](#struct_cap_touch_pin_mapping) | Defines the mapping between an Arduino pin and its capacitive touch hardware settings.
 
 # class `CapacitiveTouch` <a id="class_capacitive_touch" class="anchor"></a>
 
@@ -95,73 +94,5 @@ Retrieves the current detection threshold.
 
 #### Returns
 int The current threshold value.
-<hr />
-
-# struct `CapTouchPinMapping` <a id="struct_cap_touch_pin_mapping" class="anchor"></a>
-
-Defines the mapping between an Arduino pin and its capacitive touch hardware settings.
-
-Each entry includes the Arduino pin number, a flag indicating support, and additional hardware parameters needed for the CTSU.
-
-## Summary
-
- Members                        | Descriptions                                
---------------------------------|---------------------------------------------
-| [`arduinoPin`](#struct_cap_touch_pin_mapping_1a8f558f88fa5298ded8cbbdd4830b4cbe) | Arduino pin number (e.g., D4, D3, A4) |
-| [`supported`](#struct_cap_touch_pin_mapping_1a4e27a8d3ce508ad4bfab32ef4d94e292) | True if this pin is supported for capacitive touch sensing. |
-| [`ts_num`](#struct_cap_touch_pin_mapping_1a64ecb7d254b91a6d02229c4b26b94f26) | Touch sensor channel number. |
-| [`chac_idx`](#struct_cap_touch_pin_mapping_1aff722690ee3b00afb64221eb1cde5a75) | Channel control register index. |
-| [`chac_val`](#struct_cap_touch_pin_mapping_1ad1a206d6af3ddf996713d18190cd2f2c) | Bit mask used to enable the sensor channel. |
-
-## Members
-
-### `arduinoPin` <a id="struct_cap_touch_pin_mapping_1a8f558f88fa5298ded8cbbdd4830b4cbe" class="anchor"></a>
-
-```cpp
-uint8_t arduinoPin
-```
-
-Arduino pin number (e.g., D4, D3, A4)
-
-<hr />
-
-### `supported` <a id="struct_cap_touch_pin_mapping_1a4e27a8d3ce508ad4bfab32ef4d94e292" class="anchor"></a>
-
-```cpp
-bool supported
-```
-
-True if this pin is supported for capacitive touch sensing.
-
-<hr />
-
-### `ts_num` <a id="struct_cap_touch_pin_mapping_1a64ecb7d254b91a6d02229c4b26b94f26" class="anchor"></a>
-
-```cpp
-uint8_t ts_num
-```
-
-Touch sensor channel number.
-
-<hr />
-
-### `chac_idx` <a id="struct_cap_touch_pin_mapping_1aff722690ee3b00afb64221eb1cde5a75" class="anchor"></a>
-
-```cpp
-uint8_t chac_idx
-```
-
-Channel control register index.
-
-<hr />
-
-### `chac_val` <a id="struct_cap_touch_pin_mapping_1ad1a206d6af3ddf996713d18190cd2f2c" class="anchor"></a>
-
-```cpp
-uint8_t chac_val
-```
-
-Bit mask used to enable the sensor channel.
-
 <hr />
 
