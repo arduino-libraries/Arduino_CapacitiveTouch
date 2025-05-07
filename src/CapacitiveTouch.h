@@ -13,12 +13,7 @@
 #endif
 
 // Define a symbolic constant for the LOVE button (special pin).
-#if defined(ARDUINO_UNOR4_MINIMA)
-  #define LOVE_BUTTON 20
-#elif defined(ARDUINO_UNOR4_WIFI)
-  #define LOVE_BUTTON 27
-#endif
-
+#define LOVE_BUTTON   20  
 /**
  * @struct CapTouchPinMapping
  * @brief Defines the mapping between an Arduino pin and its capacitive touch hardware settings.
@@ -80,8 +75,13 @@ static const CapTouchPinMapping capTouchMappings[] = {
   {17, false, 0,  0,  0}, // A3 unsupported.
   {18, false, 0,  0,  0}, // A4 unsupported.
   {19, false, 0,  0,  0}, // A5 unsupported.
-  {27, true, 27,  3, (1 << 3)}  // LOVE pin on WiFi.
+  {20, true, 27, 3, (1<<3)}  
 };
+
+#define CTSUMCH0_LOVE  0x1B //TS27
+#define LOVE_PORT 1
+#define LOVE_PIN 13 //Capacitive button connected to pin P113
+
 #endif
 
 /**
