@@ -4,8 +4,15 @@ CapacitiveTouch touchButton = CapacitiveTouch(LOVE_BUTTON);
 
 void setup() {
   Serial.begin(9600);
-  touchButton.begin();
-  touchButton.setThreshold(9000);
+  
+  if(touchButton.begin()){
+    Serial.println("Capacitive touch sensor initialized.");
+  } else {
+    Serial.println("Failed to initialize capacitive touch sensor. Please use a supported pin.");
+    while(true);
+  }
+
+  touchButton.setThreshold(2000);
 }
 
 void loop() {
@@ -16,7 +23,7 @@ void loop() {
 
   // Check if the sensor is touched (raw value exceeds the threshold).
   if (touchButton.isTouched()) {
-    Serial.println("D1 touched!");
+    Serial.println("Button touched!");
   }
   
   delay(100);

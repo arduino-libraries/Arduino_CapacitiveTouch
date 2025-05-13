@@ -15,6 +15,8 @@
 // Define a symbolic constant for the LOVE button (special pin).
 #define LOVE_BUTTON   20  
 
+#define CALIBRATION_SAMPLES 16 ///< Number of samples for calibration.
+
 /**
  * @struct CapTouchPinMapping
  * @brief Defines the mapping between an Arduino pin and its capacitive touch hardware settings.
@@ -106,7 +108,7 @@ public:
      *
      * Configures the pin and initializes the CTSU/DTC hardware.
      */
-    void begin();
+    bool begin();
 
     /**
      * @brief Reads the raw sensor value.
@@ -143,6 +145,9 @@ private:
     uint8_t _chac_idx;  ///< Channel control index (from mapping).
     uint8_t _chac_val;  ///< Bit mask (from mapping).
     uint8_t _sensorIndex; ///< Index assigned after enabling the channel.
+    uint8_t _mappingIndex; ///< Index in the mapping array.
+    int     _baseline;  
+
     /**
      * @brief Looks up the mapping for a given pin.
      * @param pin The Arduino pin.
@@ -150,11 +155,21 @@ private:
      * @return true if mapping found and supported, false otherwise.
      */
     bool lookupMapping(uint8_t pin, CapTouchPinMapping &mapping);
+    int readRaw();
 
        // Low-level helper functions as static members
     static bool setTouchMode(uint8_t pin);
     static void startTouchMeasurement(bool fr);
     static bool touchMeasurementReady();
+
+    static uint8_t findMappingIndex(uint8_t pin) {
+    for (uint8_t i = 0; i < (sizeof(capTouchMappings)/sizeof(capTouchMappings[0])); i++) {
+      if (capTouchMappings[i].arduinoPin == pin) {
+        return i;
+      }
+    }
+    return 0xFF;
+  }
 };
 
 #endif // CAPACITIVE_TOUCH_H

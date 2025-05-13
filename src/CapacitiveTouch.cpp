@@ -177,17 +177,17 @@ void initDTC() {
 // Non-Template Class Member Functions
 // ------------------------------
 
-CapacitiveTouch::CapacitiveTouch(uint8_t pin) : _pin(pin), _threshold(500), _sensorIndex(0) {
-  CapTouchPinMapping mapping;
-  if (lookupMapping(pin, mapping)) {
-    _ts_num   = mapping.ts_num;
-    _chac_idx = mapping.chac_idx;
-    _chac_val = mapping.chac_val;
-  } else {
-    // If unsupported, set values to 0 (error handling; you may choose to report an error)
-    _ts_num = 0;
-    _chac_idx = 0;
-    _chac_val = 0;
+/**
+ * @brief Construct with the Arduino-side pin number (e.g. D4, A1, LOVE_BUTTON).
+ * @param pin Arduino pin (0..20 on Minima, 0..27 on WiFi).
+ */
+CapacitiveTouch::CapacitiveTouch(uint8_t pin)
+  : _pin(pin), _mappingIndex(0xFF), _threshold(500), _baseline(0), _sensorIndex(0)
+{
+  _mappingIndex = findMappingIndex(pin);
+  if (_mappingIndex != 0xFF) {
+    auto &m = capTouchMappings[_mappingIndex];
+    // stash ts_num/chac_idx/chac_val if you need them—but you can also defer that until begin()
   }
 }
 
@@ -202,27 +202,44 @@ bool CapacitiveTouch::lookupMapping(uint8_t pin, CapTouchPinMapping &mapping) {
   return false;
 }
 
-void CapacitiveTouch::begin() {
+bool CapacitiveTouch::begin() {
+  if (_mappingIndex == 0xFF) {
+    return false;
+  }
   pinMode(_pin, INPUT);
   initCTSU();
   if (!setTouchMode(_pin)) {
-    Serial.println("Error: Failed to enable touch mode on this pin.");
-    return;
+    return false;
   }
   _sensorIndex = pinToDataIndex[_pin];
-  Serial.println("CapacitiveTouch sensor initialized.");
+
+  long sum = 0;
+  for (int i = 0; i < CALIBRATION_SAMPLES; i++) {
+    sum += readRaw();
+    delay(5);
+  }
+  _baseline = sum / CALIBRATION_SAMPLES;
+  return true;
+}
+
+int CapacitiveTouch::readRaw() {
+    startTouchMeasurement(false);
+    while (!touchMeasurementReady()) {
+      delay(1);
+    }
+    return results[_sensorIndex][0];
 }
 
 int CapacitiveTouch::read() {
-  startTouchMeasurement(false);
-  while (!touchMeasurementReady()) {
-    delay(1);
-  }
-  return results[_sensorIndex][0];
+    int raw   = readRaw();
+    int delta = raw - _baseline;
+    return (delta > 0) ? delta : 0;
 }
 
 bool CapacitiveTouch::isTouched() {
-  return read() > _threshold;
+    int delta = read();
+    return (delta >  _threshold) ||
+           (delta < -_threshold);
 }
 
 void CapacitiveTouch::setThreshold(int threshold) {
