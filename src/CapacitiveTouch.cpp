@@ -17,13 +17,14 @@
 #define NOT_A_TOUCH_PIN 255
 
 #if defined(ARDUINO_UNOR4_MINIMA)
-  #define LOVE_PORT 2
-  #define LOVE_PIN 4
+  // On Minima, LOVE lives at P204
+  #define LOVE_GPIO_PORT  2
+  #define LOVE_GPIO_PIN   4
 #elif defined(ARDUINO_UNOR4_WIFI)
-  #define LOVE_PORT 1
-  #define LOVE_PIN 13
+  // On WiFi, LOVE lives at P113
+  #define LOVE_GPIO_PORT  1
+  #define LOVE_GPIO_PIN   13
 #endif
-
 // Forward declarations for internal functions used in ISRs:
 
 typedef void (*fn_callback_ptr_t)();
@@ -85,13 +86,13 @@ void CTSUWR_handler() {
     // Write ISR: typically triggers a state change.
   }
   
-  void CTSURD_handler() {
+void CTSURD_handler() {
     IRQn_Type irq = R_FSP_CurrentIrqGet();
     R_BSP_IrqStatusClear(irq);
     // Read ISR: retrieve measurement counters into the results array.
-  }
+}
   
-  void CTSUFN_handler() {
+void CTSUFN_handler() {
     IRQn_Type irq = R_FSP_CurrentIrqGet();
     R_BSP_IrqStatusClear(irq);
     ctsu_done = true;
@@ -102,7 +103,7 @@ void CTSUWR_handler() {
       // Restart measurement cycle if in free-running mode.
       startCTSUmeasure();  
     }
-  }
+}
 
 // ------------------------------
 // Low-level Hardware Initialization
@@ -175,7 +176,6 @@ void initDTC() {
 // ------------------------------
 // Non-Template Class Member Functions
 // ------------------------------
-
 
 CapacitiveTouch::CapacitiveTouch(uint8_t pin) : _pin(pin), _threshold(500), _sensorIndex(0) {
   CapTouchPinMapping mapping;
@@ -251,14 +251,21 @@ bool CapacitiveTouch::setTouchMode(uint8_t pin) {
       return false;
     }
     
-    // Configure the pin's peripheral function.
-    if (pin == NUM_ARDUINO_PINS - 1) { // Special case for LOVE pin.
-      R_PFS->PORT[LOVE_PORT].PIN[LOVE_PIN].PmnPFS = 
-        (1 << R_PFS_PORT_PIN_PmnPFS_PMR_Pos) | (12 << R_PFS_PORT_PIN_PmnPFS_PSEL_Pos);
-    } else {
-      R_IOPORT_PinCfg(&g_ioport_ctrl, g_pin_cfg[pin].pin,
-                       (uint32_t)(IOPORT_CFG_PERIPHERAL_PIN | IOPORT_PERIPHERAL_CTSU));
+
+    if (pin == LOVE_BUTTON) {
+      // configure the physical PFS for LOVE_GPIO_[PORT|PIN]
+      R_PFS->PORT[LOVE_GPIO_PORT]
+            .PIN[LOVE_GPIO_PIN]
+            .PmnPFS = (1 << R_PFS_PORT_PIN_PmnPFS_PMR_Pos)
+                     | (12 << R_PFS_PORT_PIN_PmnPFS_PSEL_Pos);
     }
+    else {
+      // all the other CTSU-capable pins
+      R_IOPORT_PinCfg(&g_ioport_ctrl,
+                      g_pin_cfg[pin].pin,
+                      IOPORT_CFG_PERIPHERAL_PIN | IOPORT_PERIPHERAL_CTSU);
+    }
+
     
     // Reinitialize CTSU hardware.
     initCTSU();
@@ -295,7 +302,7 @@ bool CapacitiveTouch::setTouchMode(uint8_t pin) {
     return true;
   }
   
-  void CapacitiveTouch::startTouchMeasurement(bool fr) {
+void CapacitiveTouch::startTouchMeasurement(bool fr) {
     free_running = fr;
     if (ctsu_done || ((R_CTSU->CTSUST & 7) == 0)) {
       ctsu_done = false;
@@ -307,6 +314,6 @@ bool CapacitiveTouch::setTouchMode(uint8_t pin) {
     }
   }
   
-  bool CapacitiveTouch::touchMeasurementReady() {
+bool CapacitiveTouch::touchMeasurementReady() {
     return (free_running || ctsu_done);
-  }
+}
