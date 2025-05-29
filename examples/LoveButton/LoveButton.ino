@@ -1,4 +1,4 @@
-#include "CapacitiveTouch.h"
+#include "Arduino_CapacitiveTouch.h"
 
 CapacitiveTouch touchButton = CapacitiveTouch(LOVE_BUTTON);
 
