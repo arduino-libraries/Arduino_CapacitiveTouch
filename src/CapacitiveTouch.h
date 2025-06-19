@@ -15,8 +15,8 @@
 // Define a symbolic constant for the LOVE button (special pin).
 #define LOVE_BUTTON   20  
 
-#define CALIBRATION_SAMPLES 16 ///< Number of samples for calibration.
-
+// Number of samples for calibration.
+#define CALIBRATION_SAMPLES 16 
 /**
  * @struct CapTouchPinMapping
  * @brief Defines the mapping between an Arduino pin and its capacitive touch hardware settings.
@@ -32,7 +32,6 @@ struct CapTouchPinMapping {
     uint8_t chac_val;     ///< Bit mask used to enable the sensor channel.
 };
 
-/// @endcond
 
 #if defined(ARDUINO_UNOR4_MINIMA)
 static const CapTouchPinMapping capTouchMappings[] = {
@@ -105,8 +104,8 @@ public:
 
     /**
      * @brief Initializes the sensor.
-     *
      * Configures the pin and initializes the CTSU/DTC hardware.
+     * @return true if initialization is successful, false otherwise.
      */
     bool begin();
 
